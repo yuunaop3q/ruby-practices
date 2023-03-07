@@ -38,11 +38,11 @@ print '   ' * first_day.wday
 
 # 月末までの数字を表すコード
 
-(first_day.day..last_day.day).each do |days|
-  if days < 10
-    print(" #{days} ")
+(first_day.day..last_day.day).each do |day|
+  if day < 10
+    print(" #{day} ")
   else
-    print("#{days} ")
+    print("#{day} ")
   end
-  print "\n" if Date.new(year, month, days).saturday?
+  print "\n" if Date.new(year, month, day).saturday?
 end
