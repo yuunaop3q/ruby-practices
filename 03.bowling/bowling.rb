@@ -7,7 +7,7 @@ shots = []
 scores.each do |s|
   if s == 'X'
     shots << 10
-    shots << nil.to_i
+    shots << 0
   else
     shots << s.to_i
   end
@@ -29,34 +29,21 @@ shots.each_slice(2) do |s|
   frames.pop
 end
 
-point = 0
-frames.each_with_index do |frame, i|
+point = frames.each_with_index.sum do |frame, i|
   if i < 9
-    if  frame[0] == 10
-      begin
-        point += 10 + frames[i + 1][0] + frames[i + 1][1]
-      rescue StandardError
-        # ↑そもそもエラーが出ないようにしないといけないと思うのですが、調べると例外処理というやり方があったので今回実践してみました。
-        point += 10 + frames[i + 1][0] + frames[i + 2][0]
-      end
-
-    elsif frame.include?(frame[2])
-      point += frame[0] + frame[1] + frame[2]
-
+    if i != 8 && frames[i][0] == 10 && frames[i + 1][0] == 10
+      10 + frames[i + 1][0] + frames[i + 2][0]
+    elsif frame[0] == 10
+      10 + frames[i + 1][0] + frames[i + 1][1]
+    elsif i == 8 && frames[8][0] == 10 && frames[9][0] == 10
+      20 + frames[i + 1][1]
     elsif frame[0] + frame[1] == 10
-      point += 10 + frames[i + 1][0]
-
+      10 + frames[i + 1][0]
     else
-      point += frame[0] + frame[1]
+      frame[0] + frame[1]
     end
-  elsif i == 9 && frame[0] == 10
-    point += frame[0] + frame[1] + frame[2]
-  elsif i == 9 && frame[1] == 10
-    point += frame[0] + frame[1] + frame[2]
-  elsif i == 9 && frame[0] + frame[1] == 10
-    point += frame[0] + frame[1] + frame[2]
   else
-    point += frames[9][0] + frames[9][1]
+    frames[9].sum
   end
 end
 
