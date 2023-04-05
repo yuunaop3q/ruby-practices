@@ -29,18 +29,22 @@ shots.each_slice(2) do |s|
   frames.pop
 end
 
+def strike?(frame)
+  frame[0] == 10
+end
+
 point = frames.each_with_index.sum do |frame, i|
   if i < 9
-    if i != 8 && frames[i][0] == 10 && frames[i + 1][0] == 10
+    if i != 8 && strike?(frame) && strike?(frames[i + 1])
       10 + frames[i + 1][0] + frames[i + 2][0]
-    elsif frame[0] == 10
+    elsif strike?(frame)
       10 + frames[i + 1][0] + frames[i + 1][1]
-    elsif i == 8 && frames[8][0] == 10 && frames[9][0] == 10
+    elsif i == 8 && strike?(frames[8]) && strike?(frames[9])
       20 + frames[i + 1][1]
-    elsif frame[0] + frame[1] == 10
+    elsif frame.sum == 10
       10 + frames[i + 1][0]
     else
-      frame[0] + frame[1]
+      frame.sum
     end
   else
     frames[9].sum
