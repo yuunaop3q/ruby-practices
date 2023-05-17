@@ -7,13 +7,28 @@ end
 def print_files_in_columns(col_size)
   use_files = take_files
   maxlen = use_files.max_by(&:length).length
-  lines = (use_files.size / col_size.to_f).ceil
-  use_files << nil.to_s until (use_files.size % col_size).zero?
+  lines = calculate_number_of_rows(use_files, col_size)
+  use_files = fill_empty_files(use_files, lines, col_size)
+  transposed_array = transpose_files(use_files, lines)
+  display_files_in_columns(transposed_array, maxlen)
+end
 
-  transposed_array = use_files.each_slice(lines).to_a.transpose
+def calculate_number_of_rows(file_count, col_size)
+  (file_count.size / col_size.to_f).ceil
+end
 
+def fill_empty_files(files, lines, col_size)
+  extra_files = lines * col_size - files.size
+  files.concat([nil] * extra_files)
+end
+
+def transpose_files(files, lines)
+  files.each_slice(lines).to_a.transpose
+end
+
+def display_files_in_columns(transposed_array, maxlen)
   transposed_array.each do |file|
-    puts file.map { |f| f.ljust(maxlen + 10) }.join
+    puts file.map { |f| f.to_s.ljust(maxlen + 10) }.join
   end
 end
 
