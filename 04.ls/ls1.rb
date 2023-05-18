@@ -9,8 +9,7 @@ def print_files_in_columns(col_size)
   maxlen = use_files.max_by(&:length).length
   lines = calculate_number_of_rows(use_files, col_size)
   use_files = fill_empty_files(use_files, lines, col_size)
-  transposed_array = transpose_files(use_files, lines)
-  display_files_in_columns(transposed_array, maxlen)
+  display_files_in_columns(transpose_files(use_files, lines), maxlen)
 end
 
 def calculate_number_of_rows(file_count, col_size)
