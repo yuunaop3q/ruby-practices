@@ -4,8 +4,20 @@ def take_files
   Dir.glob('*').sort
 end
 
+def take_dot_files
+  Dir.glob('*', File::FNM_DOTMATCH)
+end
+
 def print_files_in_columns(col_size)
   use_files = take_files
+  maxlen = use_files.max_by(&:length).length
+  lines = calculate_number_of_rows(use_files, col_size)
+  use_files = fill_empty_files(use_files, lines, col_size)
+  display_files_in_columns(transpose_files(use_files, lines), maxlen)
+end
+
+def print_dot_files_in_columns(col_size)
+  use_files = take_dot_files
   maxlen = use_files.max_by(&:length).length
   lines = calculate_number_of_rows(use_files, col_size)
   use_files = fill_empty_files(use_files, lines, col_size)
@@ -31,4 +43,8 @@ def display_files_in_columns(transposed_array, maxlen)
   end
 end
 
-print_files_in_columns(3)
+if ARGV.include?('-a')
+  print_dot_files_in_columns(3)
+else
+  print_files_in_columns(3)
+end
