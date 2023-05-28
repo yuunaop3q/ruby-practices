@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
+require 'optparse'
+
 def take_files
-  if ARGV.include?('-a')
-    Dir.glob('*', File::FNM_DOTMATCH)
-  else
-    Dir.glob('*').sort
-  end
+  params = ARGV.getopts('a')
+  flags = params['a'] ? File::FNM_DOTMATCH : 0
+  Dir.glob('*', flags).sort
 end
 
 def print_files_in_columns(col_size)
