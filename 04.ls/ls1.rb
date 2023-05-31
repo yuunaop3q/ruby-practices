@@ -11,11 +11,7 @@ def print_files_in_columns(col_size)
   maxlen = use_files.max_by(&:length).length
   lines = calculate_number_of_rows(use_files, col_size)
   use_files = fill_empty_files(use_files, lines, col_size)
-  if ARGV.include?('-r')
-    display_files_in_columns_reverse(transpose_files(use_files, lines), maxlen)
-  else
-    display_files_in_columns(transpose_files(use_files, lines), maxlen)
-  end
+  display_files_in_columns(transpose_files(use_files, lines), maxlen)
 end
 
 def calculate_number_of_rows(file_count, col_size)
@@ -33,13 +29,12 @@ end
 
 def display_files_in_columns(transposed_array, maxlen)
   transposed_array.each do |file|
-    puts file.map { |f| f.to_s.ljust(maxlen + 10) }.join
-  end
-end
-
-def display_files_in_columns_reverse(transposed_array, maxlen)
-  transposed_array.each do |file|
-    puts file.map { |f| f.to_s.ljust(maxlen + 10) }.sort.reverse.join
+    arrange_files = file.compact.map { |f| f.to_s.ljust(maxlen + 10) }
+    if ARGV.include?('-r')
+      puts arrange_files.reverse.join
+    else
+      puts arrange_files.join
+    end
   end
 end
 
