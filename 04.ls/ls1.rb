@@ -1,18 +1,19 @@
 # frozen_string_literal: true
-require 'debug'
+
 require 'optparse'
 
 def take_files
-  Dir.glob('*').sort
+  Dir.glob('*').sort.reverse
 end
 
-def print_files_in_columns(col_size, reverse_order)
+def print_files_in_columns(col_size, _reverse_order)
   use_files = take_files
   maxlen = use_files.max_by(&:length).length
   lines = calculate_number_of_rows(use_files, col_size)
   use_files = fill_empty_files(use_files, lines, col_size)
-  display_files_in_columns(transpose_files(use_files, lines), maxlen, reverse_order)
+  display_files_in_columns(transpose_files(use_files, lines), maxlen)
 end
+
 def calculate_number_of_rows(file_count, col_size)
   (file_count.size / col_size.to_f).ceil
 end
@@ -23,19 +24,13 @@ def fill_empty_files(files, lines, col_size)
 end
 
 def transpose_files(files, lines)
-  # binding.irb
-    files.each_slice(lines).to_a.transpose
+  files.each_slice(lines).to_a.transpose
 end
 
-def display_files_in_columns(transposed_array, maxlen, reverse_order)
-  # binding.irb
-  transposed_array.reverse.each do |file|
+def display_files_in_columns(transposed_array, maxlen)
+  transposed_array.each do |file|
     arrange_files = file.compact.map { |f| f.to_s.ljust(maxlen + 10) }
-    if reverse_order
-      puts arrange_files.sort.reverse.join
-    else
-      puts arrange_files.join
-    end
+    puts arrange_files.join
   end
 end
 
