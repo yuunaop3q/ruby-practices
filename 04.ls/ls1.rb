@@ -2,14 +2,20 @@
 
 require 'optparse'
 
-def take_files
-  params = ARGV.getopts('a')
-  flags = params['a'] ? File::FNM_DOTMATCH : 0
-  Dir.glob('*', flags).sort
+options = {}
+OptionParser.new do |opts|
+  opts.on('-r') do
+    options[:reverse] = true
+  end
+end.parse!
+
+def take_files(options)
+  files = Dir.glob('*').sort
+  options[:reverse] ? files.reverse : files
 end
 
-def print_files_in_columns(col_size)
-  use_files = take_files
+def print_files_in_columns(col_size, options)
+  use_files = take_files(options)
   maxlen = use_files.max_by(&:length).length
   lines = calculate_number_of_rows(use_files, col_size)
   use_files = fill_empty_files(use_files, lines, col_size)
@@ -31,8 +37,9 @@ end
 
 def display_files_in_columns(transposed_array, maxlen)
   transposed_array.each do |file|
-    puts file.map { |f| f.to_s.ljust(maxlen + 10) }.join
+    arrange_files = file.compact.map { |f| f.to_s.ljust(maxlen + 10) }
+    puts arrange_files.join
   end
 end
 
-print_files_in_columns(3)
+print_files_in_columns(3, options)
