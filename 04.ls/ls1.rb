@@ -6,9 +6,11 @@ require 'optparse'
 options = {}
 OptionParser.new do |opts|
   opts.on('-l') do
-    options[:info] = true
+    options[:l] = true
   end
 end.parse!
+
+COL_SIZE = 3
 
 def print_files_in_columns(col_size)
   use_files = take_files
@@ -64,7 +66,7 @@ def hash_symbols
   }
 end
 
-def file_info(file_path)
+def display_detailed_file_info(file_path)
   file_stat = File::Stat.new(file_path)
   permissions = permissions(file_stat)
   hard_links = hard_links(file_stat)
@@ -125,27 +127,24 @@ def specifying_permissions(first_permissions, hash_symbols)
   first_permissions[2..].chars.map { |digit| hash_symbols[digit] }
 end
 
-def path_info(take_files, directory_path)
-  files_info = []
+def file_info_to_array(take_files, directory_path)
   take_files.map do |file|
     file_path = File.join(directory_path, file)
-    files_info << file_info(file_path)
+    display_detailed_file_info(file_path)
   end
-  files_info
 end
 
 def list_directory(directory_path, take_files, options, col_size)
-  if options[:info] == true
+  if options[:l]
     total_file_blocks = take_files.sum { |file| File.stat(file).blocks }
     puts "total #{total_file_blocks}"
-    files_info = path_info(take_files, directory_path)
-    puts files_info
+    array_of_files = file_info_to_array(take_files, directory_path)
+    puts array_of_files
   else
-    col_size = 3
+    col_size = COL_SIZE
     print_files_in_columns(col_size)
   end
 end
 
 directory_path = '/Users/chi/ruby-practices/04.ls'
-col_size = 3
-list_directory(directory_path, take_files, options, col_size)
+list_directory(directory_path, take_files, options, COL_SIZE)
