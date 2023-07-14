@@ -53,18 +53,16 @@ def first_hash_symbols(align_permissions)
   )
 end
 
-def hash_symbols
-  {
-    '0' => '---',
-    '1' => '--x',
-    '2' => '-w-',
-    '3' => '-wx',
-    '4' => 'r--',
-    '5' => 'r-x',
-    '6' => 'rw-',
-    '7' => 'rwx'
-  }
-end
+HASH_SYMBOLS = {
+  '0' => '---',
+  '1' => '--x',
+  '2' => '-w-',
+  '3' => '-wx',
+  '4' => 'r--',
+  '5' => 'r-x',
+  '6' => 'rw-',
+  '7' => 'rwx'
+}.freeze
 
 def display_detailed_file_info(file_path)
   file_stat = File::Stat.new(file_path)
@@ -119,12 +117,12 @@ def permissions_replacement(file_stat)
   first_permissions = first_hash_symbols(align_permissions)
   [
     first_hash_symbols(align_permissions).match(/(p|c|d|b|-|l|s)/),
-    specifying_permissions(first_permissions, hash_symbols) # permissionの文字列を返すように修正する
+    specifying_permissions(first_permissions) # permissionの文字列を返すように修正する
   ].join
 end
 
-def specifying_permissions(first_permissions, hash_symbols)
-  first_permissions[2..].chars.map { |digit| hash_symbols[digit] }
+def specifying_permissions(first_permissions)
+  first_permissions[2..].chars.map { |digit| HASH_SYMBOLS[digit] }
 end
 
 def file_info_to_array(take_files, directory_path)
@@ -146,5 +144,10 @@ def list_directory(directory_path, take_files, options, col_size)
   end
 end
 
-directory_path = '/Users/chi/ruby-practices/04.ls'
+directory_path = if options[:l]
+                   '/Users/chi/ruby-practices/04.ls'
+                 else
+                   '.'
+                 end
+
 list_directory(directory_path, take_files, options, COL_SIZE)
