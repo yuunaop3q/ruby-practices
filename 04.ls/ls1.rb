@@ -12,8 +12,8 @@ end.parse!
 
 COL_SIZE = 3
 
-def print_files_in_columns(col_size)
-  use_files = take_files
+def print_files_in_columns(col_size, directory_path)
+  use_files = take_files(directory_path)
   maxlen = use_files.max_by(&:length).length
   lines = calculate_number_of_rows(use_files, col_size)
   use_files = fill_empty_files(use_files, lines, col_size)
@@ -76,8 +76,8 @@ def display_detailed_file_info(file_path)
   "#{permissions} #{hard_links} #{user_name} #{group_name} #{size} #{modified_time} #{file_name}"
 end
 
-def take_files
-  Dir.glob('*').sort
+def take_files(directory_path)
+  Dir.glob(File.join(directory_path, '*')).sort
 end
 
 def permissions(file_stat)
@@ -125,29 +125,24 @@ def specifying_permissions(first_permissions)
   first_permissions[2..].chars.map { |digit| HASH_SYMBOLS[digit] }
 end
 
-def file_info_to_array(take_files, directory_path)
-  take_files.map do |file|
+def file_info_to_array(directory_path)
+  take_files(directory_path).map do |file|
     file_path = File.join(directory_path, file)
     display_detailed_file_info(file_path)
   end
 end
 
-def list_directory(directory_path, take_files, options, col_size)
+def list_directory(directory_path, options, col_size)
   if options[:l]
-    total_file_blocks = take_files.sum { |file| File.stat(file).blocks }
+    total_file_blocks = take_files(directory_path).sum { |file| File.stat(file).blocks }
     puts "total #{total_file_blocks}"
-    array_of_files = file_info_to_array(take_files, directory_path)
+    array_of_files = file_info_to_array(directory_path)
     puts array_of_files
   else
     col_size = COL_SIZE
-    print_files_in_columns(col_size)
+    print_files_in_columns(col_size, directory_path)
   end
 end
 
-directory_path = if options[:l]
-                   '/Users/chi/ruby-practices/04.ls'
-                 else
-                   '.'
-                 end
-
-list_directory(directory_path, take_files, options, COL_SIZE)
+directory_path = ARGV.length.positive? ? File.expand_path(ARGV[0].to_s, '/Users') : '.'
+list_directory(directory_path, options, COL_SIZE)
