@@ -86,15 +86,9 @@ end
 
 def take_files(options)
   files = Dir.glob('*').sort
-  if options[:a] && options[:r]
-    Dir.glob('*', File::FNM_DOTMATCH).reverse
-  elsif options[:a]
-    Dir.glob('*', File::FNM_DOTMATCH)
-  elsif options[:r]
-    files.reverse
-  else
-    files
-  end
+  files = Dir.glob('*', File::FNM_DOTMATCH).sort if options[:a]
+  files = files.reverse if options[:r]
+  files
 end
 
 def permissions(file_stat)
