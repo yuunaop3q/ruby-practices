@@ -8,12 +8,20 @@ OptionParser.new do |opts|
   opts.on('-l') do
     options[:l] = true
   end
+
+  opts.on('-r') do
+    options[:r] = true
+  end
+
+  opts.on('-a') do
+    options[:a] = true
+  end
 end.parse!
 
 COL_SIZE = 3
 
-def print_files_in_columns(col_size)
-  use_files = take_files
+def print_files_in_columns(col_size, options)
+  use_files = take_files(options)
   maxlen = use_files.max_by(&:length).length
   lines = calculate_number_of_rows(use_files, col_size)
   use_files = fill_empty_files(use_files, lines, col_size)
@@ -76,8 +84,17 @@ def display_detailed_file_info(file_path)
   "#{permissions} #{hard_links} #{user_name} #{group_name} #{size} #{modified_time} #{file_name}"
 end
 
-def take_files
-  Dir.glob('*').sort
+def take_files(options)
+  files = Dir.glob('*').sort
+  if options[:a] && options[:r]
+    Dir.glob('*', File::FNM_DOTMATCH).reverse
+  elsif options[:a]
+    Dir.glob('*', File::FNM_DOTMATCH)
+  elsif options[:r]
+    files.reverse
+  else
+    files
+  end
 end
 
 def permissions(file_stat)
@@ -140,9 +157,9 @@ def list_directory(directory_path, take_files, options, col_size)
     puts array_of_files
   else
     col_size = COL_SIZE
-    print_files_in_columns(col_size)
+    print_files_in_columns(col_size, options)
   end
 end
 
 directory_path = ARGV.length.positive? ? ARGV[0] : '.'
-list_directory(directory_path, take_files, options, COL_SIZE)
+list_directory(directory_path, take_files(options), options, COL_SIZE)
