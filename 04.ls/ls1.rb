@@ -85,9 +85,9 @@ def display_detailed_file_info(file_path)
 end
 
 def take_files(options)
-  files = Dir.glob('*').sort
-  files = Dir.glob('*', File::FNM_DOTMATCH).sort if options[:a]
-  files = files.reverse if options[:r]
+  flags = options[:a] ? File::FNM_DOTMATCH : 0
+  files = Dir.glob('*', flags).sort
+  files.reverse! if options[:r]
   files
 end
 
